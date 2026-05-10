@@ -6,6 +6,8 @@ import at.blvckbytes.cm_mapper.mapper.section.CSIgnore;
 import at.blvckbytes.cm_mapper.mapper.section.ConfigSection;
 import at.blvckbytes.component_markup.expression.interpreter.InterpretationEnvironment;
 import at.blvckbytes.component_markup.util.logging.InterpreterLogger;
+import at.blvckbytes.playtime_rankup.duration_syntax.DurationException;
+import at.blvckbytes.playtime_rankup.duration_syntax.DurationSyntax;
 import net.luckperms.api.model.group.Group;
 import org.jetbrains.annotations.Nullable;
 
@@ -30,34 +32,14 @@ public class RankSection extends ConfigSection {
   public void afterParsing(List<Field> fields) throws Exception {
     super.afterParsing(fields);
 
-    for (var timePart : requiredPlayTime.split(" ")) {
-      var length = timePart.length();
-
-      if (length == 0)
-        continue;
-
-      var unitChar = Character.toLowerCase(timePart.charAt(length - 1));
-
-      var multiplier = switch (unitChar) {
-        case 'h' -> 20 * 60 * 60;
-        case 'd' -> 20 * 60 * 60 * 24;
-        default -> throw new MappingError("Unsupported unit: " + unitChar);
-      };
-
-      var valueString = timePart.substring(0, length - 1);
-
-      long value;
-
-      try {
-        value = Long.parseLong(valueString);
-      } catch (Throwable e) {
-        throw new MappingError("Malformed time-value: " + valueString);
+    try {
+      _requiredPlayTimeTicks = DurationSyntax.parseSyntaxIntoTicks(requiredPlayTime);
+    } catch (DurationException e) {
+      switch (e.error) {
+        case UNSUPPORTED_UNIT -> throw new MappingError("Property \"requiredPlayTime\": Unsupported unit: " + e.errorToken);
+        case MALFORMED_NUMBER -> throw new MappingError("Property \"requiredPlayTime\": Malformed number: " + e.errorToken);
+        case NEGATIVE_NUMBER  -> throw new MappingError("Property \"requiredPlayTime\": Negative number: " + e.errorToken);
       }
-
-      if (value <= 0)
-        throw new MappingError("A time-value cannot be less than or equal to zero");
-
-      _requiredPlayTimeTicks += value * multiplier;
     }
 
     if (_requiredPlayTimeTicks <= 0)
