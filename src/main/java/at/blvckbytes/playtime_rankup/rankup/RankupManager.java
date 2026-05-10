@@ -143,7 +143,7 @@ public class RankupManager implements Listener {
     plugin.getLogger().info("Added parent-group " + rank.group.getName() + " to " + player.getPlayerId() + " (" + player.getPlayerName() + ")");
 
     var environment = new InterpretationEnvironment()
-      .withVariable("player", player.getPlayerName())
+      .withVariable("player_name", player.getPlayerName())
       .withVariable("group", rank.group.getDisplayName())
       .withVariable("required_time", rank._requiredPlayTimeTicks);
 

@@ -39,7 +39,7 @@ public class MessagesSection extends ConfigSection {
           receiver.sendTitlePart(TitlePart.TITLE, titleComponent);
 
         if (subtitleComponent != null)
-          receiver.sendTitlePart(TitlePart.TITLE, subtitleComponent);
+          receiver.sendTitlePart(TitlePart.SUBTITLE, subtitleComponent);
 
         receiver.sendTitlePart(
           TitlePart.TIMES,
