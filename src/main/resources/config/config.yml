@@ -5,3 +5,47 @@ incrementIntervalTicks: 10
 calendarBucketKeyUpdateIntervalSeconds: 5
 timeZoneId: 'Europe/Berlin'
 ranks:
+rewardsDisplay:
+  title: '<&8>{player_name}''s Rewards'
+  rows: 5
+  items:
+    statistics:
+      type: OAK_HANGING_SIGN
+      slots: 13
+      name: |
+        <reset>
+          <&8>» <&6>Statistiken <&8>«
+      lore: |
+        <reset>
+          <br/>
+          <&9>Gesamtzeit<br/>
+          <&8>➥ <&e>Aktiv <&6><$lut.time_format [time]="play_time" /> <&7>(#{play_time_global_top_place})<br/>
+          <&8>➥ <&e>AFK <&6><$lut.time_format [time]="afk_time" /> <&7>(#{afk_time_global_top_place})<br/>
+          <br/>
+          <&9>Dieser Tag <&7>(<$lut.date_now format="EEE" />)<br/>
+          <&8>➥ <&e>Aktiv <&6><$lut.time_format [time]="play_time_day" /> <&7>(#{play_time_day_top_place})<br/>
+          <&8>➥ <&e>AFK <&6><$lut.time_format [time]="afk_time_day" /> <&7>(#{afk_time_day_top_place})<br/>
+          <br/>
+          <&9>Diese Woche <&7>(<$lut.date_now format="YYYY-'W'ww" />)<br/>
+          <&8>➥ <&e>Aktiv <&6><$lut.time_format [time]="play_time_week" /> <&7>(#{play_time_week_top_place})<br/>
+          <&8>➥ <&e>AFK <&6><$lut.time_format [time]="afk_time_week" /> <&7>(#{afk_time_week_top_place})<br/>
+          <br/>
+          <&9>Diesen Monat <&7>(<$lut.date_now format="MMM" />)<br/>
+          <&8>➥ <&e>Aktiv <&6><$lut.time_format [time]="play_time_month" /> <&7>(#{play_time_month_top_place})<br/>
+          <&8>➥ <&e>AFK <&6><$lut.time_format [time]="afk_time_month" /> <&7>(#{afk_time_month_top_place})<br/>
+          <br/>
+          <&9>Dieses Jahr <&7>(<$lut.date_now format="yyyy" />)<br/>
+          <&8>➥ <&e>Aktiv <&6><$lut.time_format [time]="play_time_year" /> <&7>(#{play_time_year_top_place})<br/>
+          <&8>➥ <&e>AFK <&6><$lut.time_format [time]="afk_time_year" /> <&7>(#{afk_time_year_top_place})<br/>
+
+    filler:
+      type: BLACK_STAINED_GLASS_PANE
+      name: ' '
+      slots: '0..last_slot'
+
+sLut:
+cLut:
+  time_format: |
+    <container *if="time < 20">0s</>
+    <duration *else [value]="time / 20.0 * 1000.0" units="smhd" />
+  date_now: '<date [format] locale="de" />'

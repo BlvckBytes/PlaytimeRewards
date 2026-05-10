@@ -1,4 +1,4 @@
-package at.blvckbytes.playtime_rankup.config;
+package at.blvckbytes.playtime_rankup.rewards_display.config;
 
 import at.blvckbytes.cm_mapper.mapper.section.CSAlways;
 import at.blvckbytes.cm_mapper.mapper.section.ConfigSection;
@@ -6,12 +6,13 @@ import at.blvckbytes.cm_mapper.section.gui.GuiItemStackSection;
 import at.blvckbytes.component_markup.expression.interpreter.InterpretationEnvironment;
 import at.blvckbytes.component_markup.util.logging.InterpreterLogger;
 
-public class IconSection extends ConfigSection {
+@CSAlways
+public class RewardsDisplayItemsSection extends ConfigSection {
 
-  public @CSAlways GuiItemStackSection pending;
-  public @CSAlways GuiItemStackSection claimed;
+  public GuiItemStackSection statistics;
+  public GuiItemStackSection filler;
 
-  public IconSection(InterpretationEnvironment baseEnvironment, InterpreterLogger interpreterLogger) {
+  public RewardsDisplayItemsSection(InterpretationEnvironment baseEnvironment, InterpreterLogger interpreterLogger) {
     super(baseEnvironment, interpreterLogger);
   }
 }

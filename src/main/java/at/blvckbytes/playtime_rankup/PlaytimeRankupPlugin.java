@@ -2,12 +2,10 @@ package at.blvckbytes.playtime_rankup;
 
 import at.blvckbytes.cm_mapper.ConfigHandler;
 import at.blvckbytes.cm_mapper.ConfigKeeper;
-import at.blvckbytes.playtime_rankup.command.AfkTopCommand;
-import at.blvckbytes.playtime_rankup.command.OfflinePlayerRegistry;
-import at.blvckbytes.playtime_rankup.command.PlayTopCommand;
-import at.blvckbytes.playtime_rankup.command.PlaytimeCommand;
+import at.blvckbytes.playtime_rankup.command.*;
 import at.blvckbytes.playtime_rankup.config.MainSection;
 import at.blvckbytes.playtime_rankup.rankup.RankupManager;
+import at.blvckbytes.playtime_rankup.rewards_display.RewardsDisplayHandler;
 import at.blvckbytes.playtime_rankup.store.CalendarInfoProvider;
 import at.blvckbytes.playtime_rankup.store.UserDataStore;
 import net.ess3.api.IEssentials;
@@ -21,9 +19,11 @@ import java.util.logging.Level;
 
 public class PlaytimeRankupPlugin extends JavaPlugin {
 
-  // TODO: Rewards-display with live statistics (redraw every tick)
+  // TODO: Reload-command
+  // TODO: Put all messages into the config
 
   private @Nullable UserDataStore userDataStore;
+  private @Nullable RewardsDisplayHandler rewardsDisplayHandler;
 
   @Override
   public void onEnable() {
@@ -56,9 +56,13 @@ public class PlaytimeRankupPlugin extends JavaPlugin {
       var offlinePlayerRegistry = new OfflinePlayerRegistry();
       getServer().getPluginManager().registerEvents(offlinePlayerRegistry, this);
 
+      rewardsDisplayHandler = new RewardsDisplayHandler(config, this);
+      getServer().getPluginManager().registerEvents(rewardsDisplayHandler, this);
+
       Objects.requireNonNull(getCommand("playtime")).setExecutor(new PlaytimeCommand(userDataStore, offlinePlayerRegistry));
       Objects.requireNonNull(getCommand("playtop")).setExecutor(new PlayTopCommand(userDataStore));
       Objects.requireNonNull(getCommand("afktop")).setExecutor(new AfkTopCommand(userDataStore));
+      Objects.requireNonNull(getCommand("rewards")).setExecutor(new RewardsCommand(userDataStore, rewardsDisplayHandler, offlinePlayerRegistry));
     } catch (Throwable e) {
       logger.log(Level.SEVERE, "An error occurred while trying to enable the plugin; disabling!", e);
       Bukkit.getPluginManager().disablePlugin(this);
@@ -70,6 +74,11 @@ public class PlaytimeRankupPlugin extends JavaPlugin {
     if (userDataStore != null) {
       catchAll(userDataStore::onDisable);
       userDataStore = null;
+    }
+
+    if (rewardsDisplayHandler != null) {
+      catchAll(rewardsDisplayHandler::onDisable);
+      rewardsDisplayHandler = null;
     }
   }
 

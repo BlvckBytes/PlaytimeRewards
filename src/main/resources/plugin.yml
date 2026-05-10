@@ -14,3 +14,7 @@ commands:
     description: View the top leaderboards for playtime
   afktop:
     description: View the top leaderboards for AFK time
+
+permissions:
+  playtimerankup.rewards.other:
+    description: View the rewards of other players

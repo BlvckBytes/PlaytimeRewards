@@ -6,6 +6,7 @@ import at.blvckbytes.cm_mapper.mapper.section.CSIgnore;
 import at.blvckbytes.cm_mapper.mapper.section.ConfigSection;
 import at.blvckbytes.component_markup.expression.interpreter.InterpretationEnvironment;
 import at.blvckbytes.component_markup.util.logging.InterpreterLogger;
+import at.blvckbytes.playtime_rankup.rewards_display.config.RewardsDisplaySection;
 
 import java.lang.reflect.Field;
 import java.time.ZoneId;
@@ -33,6 +34,8 @@ public class MainSection extends ConfigSection {
 
   public Map<String, RankSection> ranks = new HashMap<>();
   public @CSIgnore List<RankSection> rankList = new ArrayList<>();
+
+  public RewardsDisplaySection rewardsDisplay;
 
   public MainSection(InterpretationEnvironment baseEnvironment, InterpreterLogger interpreterLogger) {
     super(baseEnvironment, interpreterLogger);
