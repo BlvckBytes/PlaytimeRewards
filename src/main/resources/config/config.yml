@@ -41,7 +41,7 @@ commands:
 commonMessages:
   onlyAvailableToPlayers: '{lut.prefix} <&c>Dieser Befehl ist nur für Spieler verfügbar!'
   hasNotPlayedBefore: '{lut.prefix} <&c>Der Spieler <&4>{name} <&c>hat noch nicht zuvor gespielt!'
-  topCommandUsage: '{lut.prefix} <&c>Benutzung: /{label} [<container *for-type="types" [type] *for-separator={,<space/>} />] [Seite] [<container *for-direction="directions" [direction] *for-separator={,<space/>} />]'
+  topCommandUsage: '{lut.prefix} <&c>Benutzung: /{label} [Seite] [<container *for-type="types" [type] *for-separator={,<space/>} />] [<container *for-direction="directions" [direction] *for-separator={,<space/>} />]'
   topCommandInvalidPage: '{lut.prefix} <&c>Ungültige Seitenzahl: <&4>{input}<&c>!'
   topCommandEmptyTopList: '{lut.prefix} <&c>Die Topliste hat noch keine Einträge!'
   topCommandExceededPages: '{lut.prefix} <&c>Die Seitenzahl <&4>{page} <&c>überschreitet die Gesamtanzahl von <&4>{number_of_pages} Seiten<&c>!'

@@ -36,22 +36,11 @@ public abstract class TopCommand implements CommandExecutor, TabCompleter {
 
   @Override
   public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String @NotNull [] args) {
-    var normalizedType = TopListType.matcher.getNormalizedConstant(TopListType.GLOBAL);
-
-    if (args.length > 0) {
-      normalizedType = TopListType.matcher.matchFirst(args[0]);
-
-      if (normalizedType == null) {
-        printUsage(sender, label);
-        return true;
-      }
-    }
-
     var page = 1;
 
-    if (args.length > 1) {
+    if (args.length > 0) {
       try {
-        page = Integer.parseInt(args[1]);
+        page = Integer.parseInt(args[0]);
 
         if (page < 0)
           throw new IllegalStateException();
@@ -59,9 +48,20 @@ public abstract class TopCommand implements CommandExecutor, TabCompleter {
         config.rootSection.commonMessages.topCommandInvalidPage.sendMessage(
           sender,
           new InterpretationEnvironment()
-            .withVariable("input", args[1])
+            .withVariable("input", args[0])
         );
 
+        return true;
+      }
+    }
+
+    var normalizedType = TopListType.matcher.getNormalizedConstant(TopListType.GLOBAL);
+
+    if (args.length > 1) {
+      normalizedType = TopListType.matcher.matchFirst(args[1]);
+
+      if (normalizedType == null) {
+        printUsage(sender, label);
         return true;
       }
     }
@@ -136,25 +136,20 @@ public abstract class TopCommand implements CommandExecutor, TabCompleter {
 
   @Override
   public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String @NotNull [] args) {
-    if (args.length == 1)
-      return TopListType.matcher.createCompletions(args[0]);
-
-    if (args.length == 2) {
-      var normalizedType = TopListType.matcher.matchFirst(args[0]);
-
-      if (normalizedType == null)
-        return List.of();
-
-      var topList = userDataStore.getTopList(normalizedType.constant, timeType, TopListDirection.DESCENDING);
+    if (args.length == 1) {
+      var topList = userDataStore.getTopList(TopListType.GLOBAL, timeType, TopListDirection.DESCENDING);
       var pageSize = config.rootSection.topListCommandsPageSize;
       var numberOfPages = (topList.size() + pageSize - 1) / pageSize;
 
       return IntStream.range(1, numberOfPages + 1)
         .mapToObj(String::valueOf)
-        .filter(it -> it.startsWith(args[1]))
+        .filter(it -> it.startsWith(args[0]))
         .limit(15)
         .toList();
     }
+
+    if (args.length == 2)
+      return TopListType.matcher.createCompletions(args[1]);
 
     if (args.length == 3)
       return TopListDirection.matcher.createCompletions(args[2]);

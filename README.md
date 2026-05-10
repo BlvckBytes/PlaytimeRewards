@@ -7,6 +7,16 @@ For now, this plugin remains as an internal tool and will not be provided public
 to do whatever your heart desires with the source-code at your own risk. It is also still a
 work-in-progress, being extended by features and having bugs fixed as time goes on.
 
+## Commands
+
+For administrative purposes only: `/playtimerewards [Action]`
+
+Accessible for all players:
+- `/playtime [Name]`
+- `/playtop [Page] [Global, Day, Week, Month, Year] [Ascending, Descending]`
+- `/afktop [Page] [Global, Day, Week, Month, Year] [Ascending, Descending]`
+- `/rewards [Name]`
+
 ## Placeholders
 
 `play` refers to the time actively played, while `afk` represents the duration spent in AFK-mode,
