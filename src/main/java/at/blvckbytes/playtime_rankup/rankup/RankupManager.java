@@ -145,7 +145,7 @@ public class RankupManager implements Listener {
     var environment = new InterpretationEnvironment()
       .withVariable("player", player.getPlayerName())
       .withVariable("group", rank.group.getDisplayName())
-      .withVariable("playtime_ticks", rank._requiredPlayTimeTicks);
+      .withVariable("required_time", rank._requiredPlayTimeTicks);
 
     rank.notification.self.sendTo(List.of(player.player), environment);
     rank.notification.broadcast.sendTo(Bukkit.getOnlinePlayers(), environment);

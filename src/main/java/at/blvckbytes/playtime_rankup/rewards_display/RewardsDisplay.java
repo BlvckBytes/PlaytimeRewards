@@ -34,14 +34,15 @@ public class RewardsDisplay extends Display<UserData> {
     for (var rank : config.rootSection.rankList) {
       var remainingTime = rank._requiredPlayTimeTicks - playTime;
 
+      environment.withVariable("required_time", rank._requiredPlayTimeTicks);
       environment.withVariable("remaining_time", remainingTime);
 
       if (remainingTime < 0) {
-        rank.icon.claimed.renderInto(inventory, environment);
+        inventory.setItem(rank.icon.slot, rank.icon.claimed.build(environment));
         continue;
       }
 
-      rank.icon.pending.renderInto(inventory, environment);
+      inventory.setItem(rank.icon.slot, rank.icon.pending.build(environment));
     }
   }
 

@@ -14,7 +14,7 @@ import java.util.List;
 
 public class RankSection extends ConfigSection {
 
-  public String requiredPlayTime;
+  public String requiredPlayTime = "";
   public @CSIgnore long _requiredPlayTimeTicks;
 
   public @CSAlways NotificationSection notification;
@@ -59,5 +59,8 @@ public class RankSection extends ConfigSection {
 
       _requiredPlayTimeTicks += value * multiplier;
     }
+
+    if (_requiredPlayTimeTicks <= 0)
+      throw new IllegalStateException("The total time of \"requiredPlayTime\" must be greater than zero");
   }
 }
