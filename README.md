@@ -13,8 +13,8 @@ For administrative purposes only: `/playtimerewards [Action]`
 
 Accessible for all players:
 - `/playtime [Name]`
-- `/playtop [Page] [Global, Day, Week, Month, Year] [Ascending, Descending]`
-- `/afktop [Page] [Global, Day, Week, Month, Year] [Ascending, Descending]`
+- `/playtop [Page] [Scope] [Order]`
+- `/afktop [Page] [Scope] [Order]`
 - `/rewards [Name]`
 
 ## Placeholders
