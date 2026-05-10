@@ -1,17 +1,12 @@
-saveIntervalSeconds: 60 * 15
-topListUpdateIntervalSeconds: 10
-maxTopListSize: 100
-topListCommandsPageSize: 10
-incrementIntervalTicks: 10
-calendarBucketKeyUpdateIntervalSeconds: 5
-timeZoneId: 'Europe/Berlin'
+# This is a partial config, containing only the difference between the default-setup and ours.
+
 ranks:
   siedler:
     requiredPlayTime: 1d
     notification:
       self:
         title: '{lut.rank_prefix.siedler}'
-        subtitle: '<&a>Rang erhalten!'
+        subtitle: '<&6>Rang erhalten!'
       broadcast:
         chat: '<$lut.uprank_broadcast [rank-prefix]="lut.rank_prefix.siedler" />'
     icon:
@@ -29,7 +24,7 @@ ranks:
     notification:
       self:
         title: '{lut.rank_prefix.buerger}'
-        subtitle: '<&a>Rang erhalten!'
+        subtitle: '<&6>Rang erhalten!'
       broadcast:
         chat: '<$lut.uprank_broadcast [rank-prefix]="lut.rank_prefix.buerger" />'
     icon:
@@ -47,7 +42,7 @@ ranks:
     notification:
       self:
         title: '{lut.rank_prefix.aristokrat}'
-        subtitle: '<&a>Rang erhalten!'
+        subtitle: '<&6>Rang erhalten!'
       broadcast:
         chat: '<$lut.uprank_broadcast [rank-prefix]="lut.rank_prefix.aristokrat" />'
     icon:
@@ -60,101 +55,8 @@ ranks:
         type: GOLD_BLOCK
         name: '<reset><&8>» {lut.rank_prefix.aristokrat} <&8>«'
         lore: '<reset><$lut.rank_description.aristokrat>'
-commands:
-  playTop:
-    name: playtop
-    playTopScreen: |
-      <&8><&m>{' ' ** 20}</> <&6>Top Spielzeit<&8> <&8><&m>{' ' ** 20}</><br/>
-      <&7>{top_type}, Seite {current_page}/{number_of_pages} ({page_size}/Seite)<br/>
-      <br/>
-      <container *for-entry="entries" *for-separator={<br/>}>
-        <&7>#{entry.place} <&e>{entry.name} <&6><$lut.time_format [time]="entry.time" />
-      </container>
-      <br/>
-  afkTop:
-    name: afktop
-    afkTopScreen: |
-      <&8><&m>{' ' ** 20}</> <&6>Top AFK-Zeit<&8> <&8><&m>{' ' ** 20}</><br/>
-      <&7>{top_type}, Seite {current_page}/{number_of_pages} ({page_size}/Seite)<br/>
-      <br/>
-      <container *for-entry="entries" *for-separator={<br/>}>
-        <&7>#{entry.place} <&e>{entry.name} <&6><$lut.time_format [time]="entry.time" />
-      </container>
-      <br/>
-  playtime:
-    name: playtime
-    consoleExecutionWithoutName: '{lut.prefix} <&c>Bei Ausführung in der Konsole ist ein Spielername verpflichtend!'
-    commandUsage: '{lut.prefix} <&c>Benutzung: /{label} [Spieler]'
-    playtimeOfSelf: |
-      {lut.prefix} <&7>Du hast <&6><$lut.time_format [time]="play_time" /> <&7>aktiv gespielt und warst <&6><$lut.time_format [time]="afk_time" /> <&7>AFK.
-    playtimeOfOther: |
-      {lut.prefix} <&e>{player_name} <&7>hat <&6><$lut.time_format [time]="play_time" /> <&7>aktiv gespielt und war <&6><$lut.time_format [time]="afk_time" /> <&7>AFK.
-  rewards:
-    name: rewards
-  main:
-    name: playtimerankup
-    commandUsage: '{lut.prefix} <&c>Benutzung: /{label} \<<&4 *for-action="actions" *for-separator={,<space/>}>{action}</>>'
-    reloadedSuccessfully: '{lut.prefix} <&7>Die Konfiguration wurde erfolgreich <&a>neu geladen<&7>.'
-    errorWhileReloading: '{lut.prefix} <&c>Es trat ein Fehler auf, während die Konfiguration neu geladen wurde; siehe Konsole!'
-commonMessages:
-  onlyAvailableToPlayers: '{lut.prefix} <&c>Dieser Befehl ist nur für Spieler verfügbar!'
-  hasNotPlayedBefore: '{lut.prefix} <&c>Der Spieler <&4>{name} <&c>hat noch nicht zuvor gespielt!'
-  topCommandUsage: '{lut.prefix} <&c>Benutzung: /{label} [<container *for-type="types" *for-separator={,<space/>}>{type}</>] [Seite]'
-  topCommandInvalidPage: '{lut.prefix} <&c>Ungültige Seitenzahl: <&4>{input}<&c>!'
-  topCommandEmptyTopList: '{lut.prefix} <&c>Die Topliste hat noch keine Einträge!'
-  topCommandExceededPages: '{lut.prefix} <&c>Die Seitenzahl <&4>{page} <&c>überschreitet die Gesamtanzahl von <&4>{number_of_pages} Seiten<&c>!'
-topListType:
-  displayNames:
-    GLOBAL: 'Gesamt'
-    DAY: 'Tag'
-    WEEK: 'Woche'
-    MONTH: 'Monat'
-    YEAR: 'Jahr'
-rewardsDisplay:
-  title: '<&8>{player_name}''s Belohnungen'
-  rows: 5
-  items:
-    statistics:
-      type: OAK_HANGING_SIGN
-      slots: 13
-      name: |
-        <reset>
-          <&8>» <&6>Statistiken <&8>«
-      lore: |
-        <reset>
-          <br/>
-          <&9>Gesamtzeit<br/>
-          <&8>➥ <&e>Aktiv <&6><$lut.time_format [time]="play_time" /> <&7>(#{play_time_global_top_place})<br/>
-          <&8>➥ <&e>AFK <&6><$lut.time_format [time]="afk_time" /> <&7>(#{afk_time_global_top_place})<br/>
-          <br/>
-          <&9>Dieser Tag <&7>(<$lut.date_now format="EEE" />)<br/>
-          <&8>➥ <&e>Aktiv <&6><$lut.time_format [time]="play_time_day" /> <&7>(#{play_time_day_top_place})<br/>
-          <&8>➥ <&e>AFK <&6><$lut.time_format [time]="afk_time_day" /> <&7>(#{afk_time_day_top_place})<br/>
-          <br/>
-          <&9>Diese Woche <&7>(<$lut.date_now format="YYYY-'W'ww" />)<br/>
-          <&8>➥ <&e>Aktiv <&6><$lut.time_format [time]="play_time_week" /> <&7>(#{play_time_week_top_place})<br/>
-          <&8>➥ <&e>AFK <&6><$lut.time_format [time]="afk_time_week" /> <&7>(#{afk_time_week_top_place})<br/>
-          <br/>
-          <&9>Diesen Monat <&7>(<$lut.date_now format="MMM" />)<br/>
-          <&8>➥ <&e>Aktiv <&6><$lut.time_format [time]="play_time_month" /> <&7>(#{play_time_month_top_place})<br/>
-          <&8>➥ <&e>AFK <&6><$lut.time_format [time]="afk_time_month" /> <&7>(#{afk_time_month_top_place})<br/>
-          <br/>
-          <&9>Dieses Jahr <&7>(<$lut.date_now format="yyyy" />)<br/>
-          <&8>➥ <&e>Aktiv <&6><$lut.time_format [time]="play_time_year" /> <&7>(#{play_time_year_top_place})<br/>
-          <&8>➥ <&e>AFK <&6><$lut.time_format [time]="afk_time_year" /> <&7>(#{afk_time_year_top_place})<br/>
-    filler:
-      type: BLACK_STAINED_GLASS_PANE
-      name: ' '
-      slots: '(0..last_slot) - (28..34)'
-
-sLut:
 cLut:
-  prefix: '<&7>[<&6>Spielzeit<&7>]'
-  time_format: |
-    <container *if="time < 20">0s</>
-    <duration *else [value]="time / 20.0 * 1000.0" units="smhd" />
-  date_now: '<date [format] locale="de" />'
-  uprank_broadcast: '{lut.prefix} <&7>Der Spieler <&a>{player_name} <&7>hat den {rank_prefix}-Rang nach Erreichen einer Spielzeit von <&a><$lut.time_format [time]="required_time" /> <&7>erhalten!'
+  uprank_broadcast: '{lut.prefix} <&7>Der Spieler <&6>{player_name} <&7>hat den {rank_prefix}-Rang nach Erreichen einer Spielzeit von <&6><$lut.time_format [time]="required_time" /> <&7>erhalten!'
   required_time_section: |
     <&d>Benötigte Spielzeit: <&e><$lut.time_format [time]="required_time" />, ohne AFK-Zeit!<br/>
     <br/>
