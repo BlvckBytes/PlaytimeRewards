@@ -86,27 +86,27 @@ public class UserData {
     }
   }
 
-  public void incrementPlayTimeTicks(int value, CalendarInfoProvider calendarInfoProvider) {
-    globalStatistics.incrementPlayTimeTicks(value);
+  public void incrementTime(TimeType timeType, int value, CalendarInfoProvider calendarInfoProvider) {
+    globalStatistics.incrementTime(timeType, value);
 
     for (var calendarBucket : CalendarBucket.ALL_VALUES) {
       var bucketStatistics = statisticsByCalendarBucketOrdinal[calendarBucket.ordinal()];
 
       bucketStatistics.updateKeyAndResetIfApplicable(calendarInfoProvider.getCalendarKey(calendarBucket));
-      bucketStatistics.incrementPlayTimeTicks(value);
+      bucketStatistics.incrementTime(timeType, value);
     }
 
     dirty = true;
   }
 
-  public void incrementAfkTimeTicks(int value, CalendarInfoProvider calendarInfoProvider) {
-    globalStatistics.incrementAfkTimeTicks(value);
+  public void decrementTime(TimeType timeType, int value, CalendarInfoProvider calendarInfoProvider) {
+    globalStatistics.decrementTime(timeType, value);
 
     for (var calendarBucket : CalendarBucket.ALL_VALUES) {
       var bucketStatistics = statisticsByCalendarBucketOrdinal[calendarBucket.ordinal()];
 
       bucketStatistics.updateKeyAndResetIfApplicable(calendarInfoProvider.getCalendarKey(calendarBucket));
-      bucketStatistics.incrementAfkTimeTicks(value);
+      bucketStatistics.decrementTime(timeType, value);
     }
 
     dirty = true;

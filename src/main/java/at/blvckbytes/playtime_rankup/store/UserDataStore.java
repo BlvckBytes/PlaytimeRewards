@@ -117,17 +117,10 @@ public class UserDataStore {
     }
   }
 
-  public void batchIncrementPlayTimeFor(Iterable<? extends PlayerIdentification> playerIdentifications, int value) {
+  public void batchIncrementTimeFor(TimeType timeType, Iterable<? extends PlayerIdentification> playerIdentifications, int value) {
     synchronized (userDataByPlayerId) {
       for (var playerIdentification : playerIdentifications)
-        access(playerIdentification.getPlayerId(), playerIdentification.getPlayerName()).incrementPlayTimeTicks(value, calendarInfoProvider);
-    }
-  }
-
-  public void batchIncrementAfkTimeFor(Iterable<? extends PlayerIdentification> playerIdentifications, int value) {
-    synchronized (userDataByPlayerId) {
-      for (var playerIdentification : playerIdentifications)
-        access(playerIdentification.getPlayerId(), playerIdentification.getPlayerName()).incrementAfkTimeTicks(value, calendarInfoProvider);
+        access(playerIdentification.getPlayerId(), playerIdentification.getPlayerName()).incrementTime(timeType, value, calendarInfoProvider);
     }
   }
 

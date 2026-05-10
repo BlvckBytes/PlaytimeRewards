@@ -23,17 +23,23 @@ public class TimeStatistics {
     };
   }
 
-  public void incrementPlayTimeTicks(int value) {
+  public void incrementTime(TimeType timeType, int value) {
     if (value <= 0)
-      throw new IllegalArgumentException("Value cannot be less than or equal to zero!");
+      throw new IllegalArgumentException("Value cannot be less than or equal to zero");
 
-    playTimeTicks += value;
+    switch (timeType) {
+      case PLAY_TIME -> playTimeTicks += value;
+      case AFK_TIME -> afkTimeTicks += value;
+    }
   }
 
-  public void incrementAfkTimeTicks(int value) {
-    if (value <= 0)
-      throw new IllegalArgumentException("Value cannot be less than or equal to zero!");
+  public void decrementTime(TimeType timeType, int value) {
+    if (value > 0)
+      throw new IllegalArgumentException("Value cannot be non-negative");
 
-    afkTimeTicks += value;
+    switch (timeType) {
+      case PLAY_TIME -> playTimeTicks -= Math.max(playTimeTicks, value);
+      case AFK_TIME -> afkTimeTicks -= Math.max(afkTimeTicks, value);
+    }
   }
 }

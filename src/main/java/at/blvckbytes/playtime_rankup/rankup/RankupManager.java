@@ -78,12 +78,12 @@ public class RankupManager implements Listener {
       }
 
       if (!activePlayersBuffer.isEmpty()) {
-        userDataStore.batchIncrementPlayTimeFor(activePlayersBuffer, intervalTicks);
+        userDataStore.batchIncrementTimeFor(TimeType.PLAY_TIME, activePlayersBuffer, intervalTicks);
         checkRankupFor(activePlayersBuffer);
       }
 
       if (!afkPlayersBuffer.isEmpty())
-        userDataStore.batchIncrementAfkTimeFor(afkPlayersBuffer, intervalTicks);
+        userDataStore.batchIncrementTimeFor(TimeType.AFK_TIME, afkPlayersBuffer, intervalTicks);
     }, 0L, 0L);
   }
 
