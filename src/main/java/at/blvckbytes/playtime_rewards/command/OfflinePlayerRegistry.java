@@ -1,5 +1,6 @@
 package at.blvckbytes.playtime_rewards.command;
 
+import at.blvckbytes.playtime_rewards.store.UserDataStore;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import org.bukkit.Bukkit;
@@ -15,10 +16,13 @@ import java.util.stream.Stream;
 
 public class OfflinePlayerRegistry implements Listener {
 
+  private final UserDataStore userDataStore;
+
   private final List<String> knownNames;
   private final Map<String, UUID> idByNameLower;
 
-  public OfflinePlayerRegistry() {
+  public OfflinePlayerRegistry(UserDataStore userDataStore) {
+    this.userDataStore = userDataStore;
     this.knownNames = new ArrayList<>();
     this.idByNameLower = new HashMap<>();
 
@@ -31,14 +35,14 @@ public class OfflinePlayerRegistry implements Listener {
   }
 
   public Stream<String> streamKnownNames() {
-    return knownNames.stream();
+    return Stream.concat(knownNames.stream(), userDataStore.streamKnownNames());
   }
 
   public @Nullable OfflinePlayer getPlayerByName(String name) {
     var playerId = idByNameLower.get(name.toLowerCase());
 
     if (playerId == null)
-      return null;
+      return userDataStore.getKnownPlayerByName(name);
 
     return Bukkit.getOfflinePlayer(playerId);
   }

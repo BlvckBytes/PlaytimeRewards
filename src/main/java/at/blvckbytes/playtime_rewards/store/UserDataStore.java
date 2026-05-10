@@ -11,6 +11,7 @@ import java.io.*;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Stream;
 
 public class UserDataStore {
 
@@ -20,6 +21,10 @@ public class UserDataStore {
   private final File userDataFolder;
 
   private final Map<UUID, UserData> userDataByPlayerId;
+
+  private @Nullable Set<String> currentlyKnownNames;
+  private @Nullable Map<String, UUID> playerIdByCurrentlyKnownNameLower;
+
   private final EnumMap<TopListType, EnumMap<TimeType, EnumMap<TopListDirection, List<UserData>>>> topListByDirectionByTimeTypeByListType;
 
   private long lastSaveStamp;
@@ -57,7 +62,7 @@ public class UserDataStore {
 
       if (now - lastTopListUpdateStamp >= config.rootSection.topListUpdateIntervalSeconds * 1000L) {
         lastTopListUpdateStamp = now;
-        Bukkit.getScheduler().runTaskAsynchronously(plugin, this::updateTopLists);
+        Bukkit.getScheduler().runTaskAsynchronously(plugin, this::updateTopListsAndKnownNamesAndIds);
       }
 
       if (now - lastCalendarBucketKeyUpdateStamp >= config.rootSection.calendarBucketKeyUpdateIntervalSeconds * 1000L) {
@@ -68,12 +73,40 @@ public class UserDataStore {
 
     Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
       loadAll();
-      updateTopLists();
+      updateTopListsAndKnownNamesAndIds();
     });
   }
 
-  private void updateTopLists() {
-    var userDataValues = new ArrayList<>(userDataByPlayerId.values());
+  public @Nullable OfflinePlayer getKnownPlayerByName(String name) {
+    if (playerIdByCurrentlyKnownNameLower == null)
+      return null;
+
+    var playerId = playerIdByCurrentlyKnownNameLower.get(name.toLowerCase());
+
+    if (playerId == null)
+      return null;
+
+    return Bukkit.getOfflinePlayer(playerId);
+  }
+
+  public Stream<String> streamKnownNames() {
+    if (currentlyKnownNames == null)
+      return Stream.empty();
+
+    return currentlyKnownNames.stream();
+  }
+
+  private void updateTopListsAndKnownNamesAndIds() {
+    List<UserData> userDataValues;
+
+    synchronized (userDataByPlayerId) {
+      userDataValues = new ArrayList<>(userDataByPlayerId.values());
+    }
+
+    var didAddNamesAndIds = false;
+
+    var knownNames = new HashSet<String>();
+    var playerIdByKnownNameLower = new HashMap<String, UUID>();
 
     for (var topListType : TopListType.ALL_VALUES) {
       for (var timeType : TimeType.ALL_VALUES) {
@@ -81,8 +114,20 @@ public class UserDataStore {
 
           direction.sort(userDataValues, topListType, timeType);
 
-          for (var index = 0; index < userDataValues.size(); ++index)
-            userDataValues.get(index).setTopListNumber(topListType, timeType, direction, index + 1);
+          for (var index = 0; index < userDataValues.size(); ++index) {
+            var userData = userDataValues.get(index);
+
+            if (!didAddNamesAndIds) {
+              var name = userData.getLastKnownName();
+
+              knownNames.add(name);
+              playerIdByKnownNameLower.put(name.toLowerCase(), userData.playerId);
+            }
+
+            userData.setTopListNumber(topListType, timeType, direction, index + 1);
+          }
+
+          didAddNamesAndIds = true;
 
           topListByDirectionByTimeTypeByListType
             .computeIfAbsent(topListType, _ -> new EnumMap<>(TimeType.class))
@@ -91,6 +136,9 @@ public class UserDataStore {
         }
       }
     }
+
+    this.playerIdByCurrentlyKnownNameLower = playerIdByKnownNameLower;
+    this.currentlyKnownNames = knownNames;
   }
 
   public List<UserData> getTopList(TopListType type, TimeType timeType, TopListDirection direction) {

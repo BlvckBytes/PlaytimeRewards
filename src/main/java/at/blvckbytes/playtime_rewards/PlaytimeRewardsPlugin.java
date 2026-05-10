@@ -67,7 +67,7 @@ public class PlaytimeRewardsPlugin extends JavaPlugin {
       var rewardsManager = new RewardsManager(userDataStore, luckPerms, essentials, config, this);
       getServer().getPluginManager().registerEvents(rewardsManager, this);
 
-      var offlinePlayerRegistry = new OfflinePlayerRegistry();
+      var offlinePlayerRegistry = new OfflinePlayerRegistry(userDataStore);
       getServer().getPluginManager().registerEvents(offlinePlayerRegistry, this);
 
       rewardsDisplayHandler = new RewardsDisplayHandler(config, this);
