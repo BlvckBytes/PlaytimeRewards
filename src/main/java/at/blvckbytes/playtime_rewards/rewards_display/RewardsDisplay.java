@@ -29,7 +29,7 @@ public class RewardsDisplay extends Display<UserData> {
     config.rootSection.rewardsDisplay.items.filler.renderInto(inventory, environment);
     config.rootSection.rewardsDisplay.items.statistics.renderInto(inventory, environment);
 
-    var playTime = displayData.getGlobalTimeTicks(TimeType.PLAY_TIME);
+    var playTime = displayData.getTotalTimeTicks(TimeType.PLAY_TIME);
 
     for (var rank : config.rootSection.rankList) {
       var remainingTime = rank._requiredPlayTimeTicks - playTime;

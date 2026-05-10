@@ -14,7 +14,7 @@ public class UserData {
 
   private String lastKnownName;
 
-  private final TimeStatistics globalStatistics;
+  private final TimeStatistics totalStatistics;
 
   private final TimeStatisticsAndKey[] statisticsByCalendarBucketOrdinal;
 
@@ -27,7 +27,7 @@ public class UserData {
   private UserData(
     UUID playerId,
     String lastKnownName,
-    TimeStatistics globalStatistics,
+    TimeStatistics totalStatistics,
     TimeStatisticsAndKey[] statisticsByCalendarBucketOrdinal
   ) {
     this.playerId = playerId;
@@ -37,7 +37,7 @@ public class UserData {
     if (lastKnownName.isBlank())
       throw new IllegalStateException("Property \"lastKnownName\" is blank");
 
-    this.globalStatistics = globalStatistics;
+    this.totalStatistics = totalStatistics;
 
     this.statisticsByCalendarBucketOrdinal = statisticsByCalendarBucketOrdinal;
 
@@ -70,8 +70,8 @@ public class UserData {
     return timeTypeBucket.getOrDefault(direction, -1);
   }
 
-  public long getGlobalTimeTicks(TimeType timeType) {
-    return globalStatistics.getTime(timeType);
+  public long getTotalTimeTicks(TimeType timeType) {
+    return totalStatistics.getTime(timeType);
   }
 
   public long getCalendarBucketTimeTicks(CalendarBucket calendarBucket, TimeType timeType) {
@@ -105,7 +105,7 @@ public class UserData {
   }
 
   public void incrementTime(TimeType timeType, long value, CalendarInfoProvider calendarInfoProvider) {
-    globalStatistics.incrementTime(timeType, value);
+    totalStatistics.incrementTime(timeType, value);
 
     for (var calendarBucket : CalendarBucket.ALL_VALUES) {
       var bucketStatistics = statisticsByCalendarBucketOrdinal[calendarBucket.ordinal()];
@@ -118,7 +118,7 @@ public class UserData {
   }
 
   public void decrementTime(TimeType timeType, long value, CalendarInfoProvider calendarInfoProvider) {
-    globalStatistics.decrementTime(timeType, value);
+    totalStatistics.decrementTime(timeType, value);
 
     for (var calendarBucket : CalendarBucket.ALL_VALUES) {
       var bucketStatistics = statisticsByCalendarBucketOrdinal[calendarBucket.ordinal()];
@@ -149,8 +149,8 @@ public class UserData {
   public String serialize() {
     var temporaryConfig = new YamlConfiguration();
 
-    temporaryConfig.set("playTimeTicks", globalStatistics.getTime(TimeType.PLAY_TIME));
-    temporaryConfig.set("afkTimeTicks", globalStatistics.getTime(TimeType.AFK_TIME));
+    temporaryConfig.set("playTimeTicks", totalStatistics.getTime(TimeType.PLAY_TIME));
+    temporaryConfig.set("afkTimeTicks", totalStatistics.getTime(TimeType.AFK_TIME));
     temporaryConfig.set("lastKnownName", lastKnownName);
 
     for (var calendarBucket : CalendarBucket.ALL_VALUES) {
@@ -170,8 +170,8 @@ public class UserData {
 
     environment
       .withVariable("player_name", lastKnownName)
-      .withVariable("play_time", getGlobalTimeTicks(TimeType.PLAY_TIME))
-      .withVariable("afk_time", getGlobalTimeTicks(TimeType.AFK_TIME));
+      .withVariable("play_time", getTotalTimeTicks(TimeType.PLAY_TIME))
+      .withVariable("afk_time", getTotalTimeTicks(TimeType.AFK_TIME));
 
     for (var timeType : TimeType.ALL_VALUES) {
       for (var topListType : TopListType.ALL_VALUES) {

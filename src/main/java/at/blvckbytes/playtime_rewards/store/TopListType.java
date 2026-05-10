@@ -8,10 +8,10 @@ import java.util.List;
 
 public enum TopListType implements MatchableEnum {
 
-  GLOBAL {
+  TOTAL {
     @Override
     public long accessStatistic(UserData userData, TimeType timeType) {
-      return userData.getGlobalTimeTicks(timeType);
+      return userData.getTotalTimeTicks(timeType);
     }
   },
 
@@ -51,7 +51,7 @@ public enum TopListType implements MatchableEnum {
 
   public CalendarBucket getCalendarBucket() {
     return switch (this) {
-      case GLOBAL -> null;
+      case TOTAL -> null;
       case DAY -> CalendarBucket.DAY;
       case WEEK -> CalendarBucket.WEEK;
       case MONTH -> CalendarBucket.MONTH;

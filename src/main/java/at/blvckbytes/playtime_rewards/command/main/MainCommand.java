@@ -144,13 +144,13 @@ public class MainCommand implements CommandExecutor, TabCompleter {
         switch (normalizedAction.constant) {
           case ADD_PLAY_TIME, ADD_AFK_TIME -> {
             didAdd = true;
-            priorValue = userData.getGlobalTimeTicks(timeType);
+            priorValue = userData.getTotalTimeTicks(timeType);
             userData.incrementTime(timeType, duration, calendarInfoProvider);
           }
 
           case SUBTRACT_PLAY_TIME, SUBTRACT_AFK_TIME -> {
             didAdd = false;
-            priorValue = userData.getGlobalTimeTicks(timeType);
+            priorValue = userData.getTotalTimeTicks(timeType);
             userData.decrementTime(timeType, duration, calendarInfoProvider);
           }
 
@@ -163,7 +163,7 @@ public class MainCommand implements CommandExecutor, TabCompleter {
             .withVariable("player_name", userData.getLastKnownName())
             .withVariable("time_type", TimeType.matcher.getNormalizedName(timeType))
             .withVariable("prior_value", priorValue)
-            .withVariable("new_value", userData.getGlobalTimeTicks(timeType))
+            .withVariable("new_value", userData.getTotalTimeTicks(timeType))
             .withVariable("delta_time", duration)
             .withVariable("did_add", didAdd)
         );

@@ -103,7 +103,7 @@ public class RewardsManager implements Listener {
 
   private void checkRewardsFor(Iterable<PlayerAndMeta> players) {
     for (var player : players) {
-      var playTime = player.userData.getGlobalTimeTicks(TimeType.PLAY_TIME);
+      var playTime = player.userData.getTotalTimeTicks(TimeType.PLAY_TIME);
 
       for (var rank : config.rootSection.rankList) {
         if (rank.group == null)

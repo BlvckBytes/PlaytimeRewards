@@ -216,8 +216,8 @@ public class UserDataStore {
           // on the first access-call, so we'd erase the player's progress; this way, a human can manually merge later on.
           // If, say, an administrator subtracted from a time-value, we have to trust the state and just carry out the save.
           if (
-            !userData.hasBeenSubtractedFrom(TimeType.PLAY_TIME) && writtenUserData.getGlobalTimeTicks(TimeType.PLAY_TIME) > userData.getGlobalTimeTicks(TimeType.PLAY_TIME)
-              || !userData.hasBeenSubtractedFrom(TimeType.AFK_TIME) && writtenUserData.getGlobalTimeTicks(TimeType.AFK_TIME) > userData.getGlobalTimeTicks(TimeType.AFK_TIME)
+            !userData.hasBeenSubtractedFrom(TimeType.PLAY_TIME) && writtenUserData.getTotalTimeTicks(TimeType.PLAY_TIME) > userData.getTotalTimeTicks(TimeType.PLAY_TIME)
+              || !userData.hasBeenSubtractedFrom(TimeType.AFK_TIME) && writtenUserData.getTotalTimeTicks(TimeType.AFK_TIME) > userData.getTotalTimeTicks(TimeType.AFK_TIME)
           ) {
             logger.severe("Stored statistics in file " + dataFile + " exceed about-to-be-saved; skipping write of " + sanitizeControlCharacters(dataString));
             continue;

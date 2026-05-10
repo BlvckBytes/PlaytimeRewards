@@ -55,7 +55,7 @@ public abstract class TopCommand implements CommandExecutor, TabCompleter {
       }
     }
 
-    var normalizedType = TopListType.matcher.getNormalizedConstant(TopListType.GLOBAL);
+    var normalizedType = TopListType.matcher.getNormalizedConstant(TopListType.TOTAL);
 
     if (args.length > 1) {
       normalizedType = TopListType.matcher.matchFirst(args[1]);
@@ -137,7 +137,7 @@ public abstract class TopCommand implements CommandExecutor, TabCompleter {
   @Override
   public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String @NotNull [] args) {
     if (args.length == 1) {
-      var topList = userDataStore.getTopList(TopListType.GLOBAL, timeType, TopListDirection.DESCENDING);
+      var topList = userDataStore.getTopList(TopListType.TOTAL, timeType, TopListDirection.DESCENDING);
       var pageSize = config.rootSection.topListCommandsPageSize;
       var numberOfPages = (topList.size() + pageSize - 1) / pageSize;
 

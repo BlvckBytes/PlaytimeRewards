@@ -54,7 +54,7 @@ commonMessages:
     </container>
     <br/>
 topListTypeDisplayNames:
-  GLOBAL: 'Gesamt'
+  TOTAL: 'Gesamt'
   DAY: 'Tag'
   WEEK: 'Woche'
   MONTH: 'Monat'
@@ -79,8 +79,8 @@ rewardsDisplay:
         <reset>
           <br/>
           <&9>Gesamtzeit<br/>
-          <&8>➥ <&e>Aktiv <&6><$lut.time_format [time]="play_time" /> <&7>(#{play_time_global_descending_top_place})<br/>
-          <&8>➥ <&e>AFK <&6><$lut.time_format [time]="afk_time" /> <&7>(#{afk_time_global_descending_top_place})<br/>
+          <&8>➥ <&e>Aktiv <&6><$lut.time_format [time]="play_time" /> <&7>(#{play_time_total_descending_top_place})<br/>
+          <&8>➥ <&e>AFK <&6><$lut.time_format [time]="afk_time" /> <&7>(#{afk_time_total_descending_top_place})<br/>
           <br/>
           <&9>Dieser Tag <&7>(<$lut.date_now format="EEE" />)<br/>
           <&8>➥ <&e>Aktiv <&6><$lut.time_format [time]="play_time_day" /> <&7>(#{play_time_day_descending_top_place})<br/>

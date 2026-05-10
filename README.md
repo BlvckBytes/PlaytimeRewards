@@ -1,6 +1,6 @@
 # PlaytimeRewards
 
-A simple yet effective play-time and afk-time tracker with global as well as calendar-bucketed
+A simple yet effective play-time and afk-time tracker with total as well as calendar-bucketed
 statistics that directly integrates with LuckPerms as to append players with new parent-groups.
 
 For now, this plugin remains as an internal tool and will not be provided publicly - feel free
@@ -20,7 +20,7 @@ Accessible for all players:
 ## Placeholders
 
 `play` refers to the time actively played, while `afk` represents the duration spent in AFK-mode,
-as marked by EssentialsX. `global` is the total, all-time statistic while the calendar-buckets
+as marked by EssentialsX. `total` is the all-time statistic while the calendar-buckets
 `day`, `week`, `month` and `year` are calendar-aligned accumulators, based on the configured locale.
 
 Accessing just the statistic itself is always relative to the executing player (or hologram-viewer, etc.),
@@ -28,11 +28,11 @@ while the suffix `_top_<N>` yields the top `N` place of all statistics within th
 it returns the time-value and with another suffix of `_name`, the last known name of that player is returned.
 
 ```
-%playtime_play_global%
-%playtime_play_global_desc_top_<N>%
-%playtime_play_global_desc_top_<N>_name%
-%playtime_play_global_asc_top_<N>%
-%playtime_play_global_asc_top_<N>_name%
+%playtime_play_total%
+%playtime_play_total_desc_top_<N>%
+%playtime_play_total_desc_top_<N>_name%
+%playtime_play_total_asc_top_<N>%
+%playtime_play_total_asc_top_<N>_name%
 %playtime_play_day%
 %playtime_play_day_desc_top_<N>%
 %playtime_play_day_desc_top_<N>_name%
@@ -54,11 +54,11 @@ it returns the time-value and with another suffix of `_name`, the last known nam
 %playtime_play_year_asc_top_<N>%
 %playtime_play_year_asc_top_<N>_name%
 
-%playtime_afk_global%
-%playtime_afk_global_desc_top_<N>%
-%playtime_afk_global_desc_top_<N>_name%
-%playtime_afk_global_asc_top_<N>%
-%playtime_afk_global_asc_top_<N>_name%
+%playtime_afk_total%
+%playtime_afk_total_desc_top_<N>%
+%playtime_afk_total_desc_top_<N>_name%
+%playtime_afk_total_asc_top_<N>%
+%playtime_afk_total_asc_top_<N>_name%
 %playtime_afk_day%
 %playtime_afk_day_desc_top_<N>%
 %playtime_afk_day_desc_top_<N>_name%
