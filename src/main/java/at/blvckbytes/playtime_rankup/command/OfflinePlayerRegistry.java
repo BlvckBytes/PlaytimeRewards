@@ -35,7 +35,7 @@ public class OfflinePlayerRegistry implements Listener {
   }
 
   public @Nullable OfflinePlayer getPlayerByName(String name) {
-    var playerId = idByNameLower.get(name);
+    var playerId = idByNameLower.get(name.toLowerCase());
 
     if (playerId == null)
       return null;
@@ -53,6 +53,9 @@ public class OfflinePlayerRegistry implements Listener {
 
   private void addKnownName(String name, UUID playerId) {
     var trimmedName = name.trim();
+
+    if (trimmedName.isBlank())
+      return;
 
     if (knownNames.stream().anyMatch(it -> it.equalsIgnoreCase(trimmedName)))
       return;
