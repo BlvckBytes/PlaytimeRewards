@@ -14,6 +14,9 @@ commands:
     description: View the top leaderboards for playtime
   afktop:
     description: View the top leaderboards for AFK time
+  playtimerankup:
+    description: The main command, to be used for administrative purposes
+    permission: playtimerankup.admin-command
 
 permissions:
   playtimerankup.rewards.other:

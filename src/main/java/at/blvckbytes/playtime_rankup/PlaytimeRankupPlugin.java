@@ -3,6 +3,7 @@ package at.blvckbytes.playtime_rankup;
 import at.blvckbytes.cm_mapper.ConfigHandler;
 import at.blvckbytes.cm_mapper.ConfigKeeper;
 import at.blvckbytes.playtime_rankup.command.*;
+import at.blvckbytes.playtime_rankup.command.main.MainCommand;
 import at.blvckbytes.playtime_rankup.config.MainSection;
 import at.blvckbytes.playtime_rankup.rankup.RankupManager;
 import at.blvckbytes.playtime_rankup.rewards_display.RewardsDisplayHandler;
@@ -19,7 +20,6 @@ import java.util.logging.Level;
 
 public class PlaytimeRankupPlugin extends JavaPlugin {
 
-  // TODO: Reload-command
   // TODO: Put all messages into the config
 
   private @Nullable UserDataStore userDataStore;
@@ -63,6 +63,7 @@ public class PlaytimeRankupPlugin extends JavaPlugin {
       Objects.requireNonNull(getCommand("playtop")).setExecutor(new PlayTopCommand(userDataStore));
       Objects.requireNonNull(getCommand("afktop")).setExecutor(new AfkTopCommand(userDataStore));
       Objects.requireNonNull(getCommand("rewards")).setExecutor(new RewardsCommand(userDataStore, rewardsDisplayHandler, offlinePlayerRegistry));
+      Objects.requireNonNull(getCommand("playtimerankup")).setExecutor(new MainCommand(config, this));
     } catch (Throwable e) {
       logger.log(Level.SEVERE, "An error occurred while trying to enable the plugin; disabling!", e);
       Bukkit.getPluginManager().disablePlugin(this);
