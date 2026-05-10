@@ -1,6 +1,6 @@
 saveIntervalSeconds: 60 * 15
 topListUpdateIntervalSeconds: 10
-maxTopListSize: 100
+maxTopListSize: 500
 topListCommandsPageSize: 10
 incrementIntervalTicks: 10
 calendarBucketKeyUpdateIntervalSeconds: 5
