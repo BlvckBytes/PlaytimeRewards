@@ -62,7 +62,7 @@ public class PlaytimeRewardsPlugin extends JavaPlugin {
       userDataStore = new UserDataStore(calendarInfoProvider, config, this);
 
       if (Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI"))
-        new PlaytimePlaceholderExpansion(this, userDataStore).register();
+        new PlaytimePlaceholderExpansion(this, userDataStore, config).register();
 
       var rewardsManager = new RewardsManager(userDataStore, luckPerms, essentials, config, this);
       getServer().getPluginManager().registerEvents(rewardsManager, this);

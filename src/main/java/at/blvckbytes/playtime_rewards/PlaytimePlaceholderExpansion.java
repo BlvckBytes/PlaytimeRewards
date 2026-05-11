@@ -1,5 +1,8 @@
 package at.blvckbytes.playtime_rewards;
 
+import at.blvckbytes.cm_mapper.ConfigKeeper;
+import at.blvckbytes.component_markup.expression.interpreter.InterpretationEnvironment;
+import at.blvckbytes.playtime_rewards.config.MainSection;
 import at.blvckbytes.playtime_rewards.store.*;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import org.bukkit.OfflinePlayer;
@@ -11,13 +14,16 @@ public class PlaytimePlaceholderExpansion extends PlaceholderExpansion {
 
   private final Plugin plugin;
   private final UserDataStore userDataStore;
+  private final ConfigKeeper<MainSection> config;
 
   public PlaytimePlaceholderExpansion(
     Plugin plugin,
-    UserDataStore userDataStore
+    UserDataStore userDataStore,
+    ConfigKeeper<MainSection> config
   ) {
     this.plugin = plugin;
     this.userDataStore = userDataStore;
+    this.config = config;
   }
 
   @Override
@@ -55,7 +61,7 @@ public class PlaytimePlaceholderExpansion extends PlaceholderExpansion {
 
     if (args[1].equals("total")) {
       if (args.length == 2)
-        return String.valueOf(userData.getTotalTimeTicks(timeType));
+        return formatTime(userData.getTotalTimeTicks(timeType));
 
       return tryAccessTopTime(args, TopListType.TOTAL, timeType);
     }
@@ -72,7 +78,7 @@ public class PlaytimePlaceholderExpansion extends PlaceholderExpansion {
       return null;
 
     if (args.length == 2)
-      return String.valueOf(userData.getCalendarBucketTimeTicks(bucketType, timeType));
+      return formatTime(userData.getCalendarBucketTimeTicks(bucketType, timeType));
 
     return tryAccessTopTime(args, bucketType.getTopListType(), timeType);
   }
@@ -106,14 +112,14 @@ public class PlaytimePlaceholderExpansion extends PlaceholderExpansion {
 
     if (args.length == 5) {
       if (targetUser == null)
-        return "0";
+        return formatTime(0);
 
       var calendarBucket = topListType.getCalendarBucket();
 
       if (calendarBucket == null)
-        return String.valueOf(targetUser.getTotalTimeTicks(timeType));
+        return formatTime(targetUser.getTotalTimeTicks(timeType));
 
-      return String.valueOf(targetUser.getCalendarBucketTimeTicks(calendarBucket, timeType));
+      return formatTime(targetUser.getCalendarBucketTimeTicks(calendarBucket, timeType));
     }
 
     if (!args[5].equals("name"))
@@ -123,5 +129,12 @@ public class PlaytimePlaceholderExpansion extends PlaceholderExpansion {
       return "undefined";
 
     return targetUser.getLastKnownName();
+  }
+
+  private String formatTime(long input) {
+    return config.rootSection.placeholderTime.asPlainString(
+      new InterpretationEnvironment()
+        .withVariable("time", input)
+    );
   }
 }

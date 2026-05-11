@@ -5,6 +5,7 @@ topListCommandsPageSize: 10
 incrementIntervalTicks: 10
 calendarBucketKeyUpdateIntervalSeconds: 5
 timeZoneId: 'Europe/Berlin'
+placeholderTime: '<$lut.time_format [time] />'
 ranks:
 commands:
   playTop:
