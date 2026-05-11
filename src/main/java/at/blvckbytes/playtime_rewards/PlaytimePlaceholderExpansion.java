@@ -63,7 +63,7 @@ public class PlaytimePlaceholderExpansion extends PlaceholderExpansion {
       if (args.length == 2)
         return formatTime(userData.getTotalTimeTicks(timeType));
 
-      return tryAccessTopTime(args, TopListType.TOTAL, timeType);
+      return tryAccessTopStatistic(userData, args, TopListType.TOTAL, timeType);
     }
 
     var bucketType = switch (args[1]) {
@@ -80,11 +80,11 @@ public class PlaytimePlaceholderExpansion extends PlaceholderExpansion {
     if (args.length == 2)
       return formatTime(userData.getCalendarBucketTimeTicks(bucketType, timeType));
 
-    return tryAccessTopTime(args, bucketType.getTopListType(), timeType);
+    return tryAccessTopStatistic(userData, args, bucketType.getTopListType(), timeType);
   }
 
-  private @Nullable String tryAccessTopTime(String[] args, TopListType topListType, TimeType timeType) {
-    if (!(args.length == 5 || args.length == 6))
+  private @Nullable String tryAccessTopStatistic(UserData userData, String[] args, TopListType topListType, TimeType timeType) {
+    if (!(args.length == 4 || args.length == 5 || args.length == 6))
       return null;
 
     var direction = switch (args[2]) {
@@ -95,6 +95,13 @@ public class PlaytimePlaceholderExpansion extends PlaceholderExpansion {
 
     if (direction == null)
       return null;
+
+    if (args.length == 4) {
+      if (args[3].equals("place"))
+        return String.valueOf(userData.getTopListNumber(topListType, timeType, direction));
+
+      return null;
+    }
 
     if (!args[3].equals("top"))
       return null;
