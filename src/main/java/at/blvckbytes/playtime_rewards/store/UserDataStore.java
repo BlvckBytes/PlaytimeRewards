@@ -96,13 +96,14 @@ public class UserDataStore {
     return currentlyKnownNames.stream();
   }
 
-  private void updateTopListsAndKnownNamesAndIds() {
-    List<UserData> userDataValues;
-
+  public List<UserData> getAllUserData() {
     synchronized (userDataByPlayerId) {
-      userDataValues = new ArrayList<>(userDataByPlayerId.values());
+      return new ArrayList<>(userDataByPlayerId.values());
     }
+  }
 
+  private void updateTopListsAndKnownNamesAndIds() {
+    var userDataValues = getAllUserData();
     var didAddNamesAndIds = false;
 
     var knownNames = new HashSet<String>();

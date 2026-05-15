@@ -44,6 +44,15 @@ commands:
       <&c *else>abgezogen</>
       ; alter Stand: <&6><$lut.time_format [time]="prior_value" /></>
       ; neuer Stand: <&6><$lut.time_format [time]="new_value" />.
+    exportUsage: |
+      {lut.prefix} <&c>Benutzung: /{label} {action}
+      <space/>\<<&4 *for-time_type="time_types" *for-separator={,<space/>}>{time_type}</>>
+      <space/>\<<&4 *for-top_type="top_types" *for-separator={,<space/>}>{top_type}</>>
+      <space/>\<<&4 *for-direction="directions" *for-separator={,<space/>}>{direction}</>>
+    exportTimeFormat:
+      <duration [value]="time / 20.0 * 1000.0" units="mhd" [zeroes]="time < 20 * 60 then 'm'" />
+    exportWriteError: '{lut.prefix} <&c>Beim schreiben der Datei trat ein Fehler auf; siehe Konsole!'
+    exportSuccess: '{lut.prefix} <&7>Der Export wurde unter <&a>{file_path}</> abgelegt.'
 commonMessages:
   onlyAvailableToPlayers: '{lut.prefix} <&c>Dieser Befehl ist nur für Spieler verfügbar!'
   hasNotPlayedBefore: '{lut.prefix} <&c>Der Spieler <&4>{name} <&c>hat noch nicht zuvor gespielt!'
@@ -111,7 +120,8 @@ rewardsDisplay:
 sLut:
 cLut:
   prefix: '<&7>[<&6>Spielzeit<&7>]'
-  time_format: '<duration [value]="time / 20.0 * 1000.0" units="smhd" zeroes="s" />'
+  time_format: |
+    <duration [value]="time / 20.0 * 1000.0" units="smhd" [zeroes]="time < 20 then 's'" />
   date_now: '<date [format] locale="de" />'
   day_now: '<$lut.date_now format="EEE" />'
   week_now: '<$lut.date_now format="YYYY-''W''ww" />'

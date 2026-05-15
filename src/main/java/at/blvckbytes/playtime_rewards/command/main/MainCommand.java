@@ -6,11 +6,9 @@ import at.blvckbytes.playtime_rewards.command.OfflinePlayerRegistry;
 import at.blvckbytes.playtime_rewards.config.MainSection;
 import at.blvckbytes.playtime_rewards.duration_syntax.DurationException;
 import at.blvckbytes.playtime_rewards.duration_syntax.DurationSyntax;
-import at.blvckbytes.playtime_rewards.store.CalendarInfoProvider;
-import at.blvckbytes.playtime_rewards.store.TimeType;
-import at.blvckbytes.playtime_rewards.store.UserData;
-import at.blvckbytes.playtime_rewards.store.UserDataStore;
+import at.blvckbytes.playtime_rewards.store.*;
 import me.blvckbytes.syllables_matcher.NormalizedConstant;
+import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -23,8 +21,11 @@ import org.jetbrains.annotations.Nullable;
 import java.io.File;
 import java.io.FileWriter;
 import java.nio.file.Paths;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;
+import java.util.StringJoiner;
 import java.util.UUID;
 import java.util.logging.Level;
 
@@ -256,6 +257,68 @@ public class MainCommand implements CommandExecutor, TabCompleter {
         sender.sendMessage("§aMigrated " + migratedFileCount + " userdata-files");
         return true;
       }
+
+      case EXPORT_USERDATA -> {
+        NormalizedConstant<TimeType> timeType;
+        NormalizedConstant<TopListType> topType;
+        NormalizedConstant<TopListDirection> direction;
+
+        if (
+          args.length != 4
+            || (timeType = TimeType.matcher.matchFirst(args[1])) == null
+            || (topType = TopListType.matcher.matchFirst(args[2])) == null
+            || (direction = TopListDirection.matcher.matchFirst(args[3])) == null
+        ) {
+          config.rootSection.commands.main.exportUsage.sendMessage(
+            sender,
+            new InterpretationEnvironment()
+              .withVariable("label", label)
+              .withVariable("action", normalizedAction.getNormalizedName())
+              .withVariable("time_types", TimeType.matcher.createCompletions(null))
+              .withVariable("top_types", TopListType.matcher.createCompletions(null))
+              .withVariable("directions", TopListDirection.matcher.createCompletions(null))
+          );
+          return true;
+        }
+
+        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+          var userData = userDataStore.getAllUserData();
+
+          direction.constant.sort(userData, topType.constant, timeType.constant);
+
+          var currentDate = LocalDateTime.now(config.rootSection._timeZone);
+          var dateStamp = DateTimeFormatter.ofPattern("ddMMyyyy-HHmmss").format(currentDate);
+          var typeString = (timeType.getNormalizedName() + "-" + topType.getNormalizedName() + "-" + direction.getNormalizedName()).toLowerCase();
+
+          var outputFile = new File(plugin.getDataFolder(), "export-" + dateStamp + "-" + typeString + ".csv");
+
+          try (var writer = new FileWriter(outputFile)) {
+            writer.write(makeCSVRow("name","uuid","time"));
+
+            for (var dataEntry : userData) {
+              var timeString = config.rootSection.commands.main.exportTimeFormat.asPlainString(
+                new InterpretationEnvironment()
+                  .withVariable("time", topType.constant.accessStatistic(dataEntry, timeType.constant))
+              );
+
+              writer.write('\n');
+              writer.write(makeCSVRow(dataEntry.getLastKnownName(), dataEntry.playerId, timeString));
+            }
+          } catch (Throwable e) {
+            plugin.getLogger().log(Level.SEVERE, "An error occurred while trying to write to " + outputFile, e);
+            config.rootSection.commands.main.exportWriteError.sendMessage(sender);
+            return;
+          }
+
+          config.rootSection.commands.main.exportSuccess.sendMessage(
+            sender,
+            new InterpretationEnvironment()
+              .withVariable("file_path", plugin.getDataFolder().getParentFile().toPath().relativize(outputFile.toPath()).toString())
+          );
+        });
+
+        return true;
+      }
     }
 
     throw new IllegalStateException("Unaccounted-for action: " + normalizedAction.constant);
@@ -274,6 +337,19 @@ public class MainCommand implements CommandExecutor, TabCompleter {
     if (normalizedAction == null)
       return List.of();
 
+    if (normalizedAction.constant == CommandAction.EXPORT_USERDATA) {
+      if (args.length == 2)
+        return TimeType.matcher.createCompletions(args[1]);
+
+      if (args.length == 3)
+        return TopListType.matcher.createCompletions(args[2]);
+
+      if (args.length == 4)
+        return TopListDirection.matcher.createCompletions(args[3]);
+
+      return List.of();
+    }
+
     switch (normalizedAction.constant) {
       case ADD_PLAY_TIME, SUBTRACT_PLAY_TIME, ADD_AFK_TIME, SUBTRACT_AFK_TIME -> {
         if (args.length == 2) {
@@ -288,5 +364,14 @@ public class MainCommand implements CommandExecutor, TabCompleter {
     }
 
     return List.of();
+  }
+
+  private String makeCSVRow(Object... fields) {
+    var result = new StringJoiner(";");
+
+    for (var field : fields)
+      result.add(String.valueOf(field).replace(";", ""));
+
+    return result.toString();
   }
 }

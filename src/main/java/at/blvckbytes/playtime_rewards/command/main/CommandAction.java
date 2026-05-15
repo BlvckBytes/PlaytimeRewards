@@ -10,6 +10,7 @@ public enum CommandAction implements MatchableEnum {
   ADD_AFK_TIME,
   SUBTRACT_AFK_TIME,
   MIGRATE_REWARDS_LITE,
+  EXPORT_USERDATA
   ;
 
   public static final EnumMatcher<CommandAction> matcher = new EnumMatcher<>(values());

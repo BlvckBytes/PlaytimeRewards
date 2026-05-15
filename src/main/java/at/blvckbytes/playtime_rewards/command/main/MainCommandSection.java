@@ -18,6 +18,10 @@ public class MainCommandSection extends CommandSection {
   public ComponentMarkup negativeDurationNumber;
   public ComponentMarkup zeroDuration;
   public ComponentMarkup timeModifiedSuccessfully;
+  public ComponentMarkup exportUsage;
+  public ComponentMarkup exportTimeFormat;
+  public ComponentMarkup exportWriteError;
+  public ComponentMarkup exportSuccess;
 
   public MainCommandSection(InterpretationEnvironment baseEnvironment, InterpreterLogger interpreterLogger) {
     super(INITIAL_NAME, baseEnvironment, interpreterLogger);
