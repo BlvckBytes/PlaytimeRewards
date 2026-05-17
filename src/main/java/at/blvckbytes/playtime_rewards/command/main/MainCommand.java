@@ -8,6 +8,7 @@ import at.blvckbytes.playtime_rewards.duration_syntax.DurationException;
 import at.blvckbytes.playtime_rewards.duration_syntax.DurationSyntax;
 import at.blvckbytes.playtime_rewards.store.*;
 import me.blvckbytes.syllables_matcher.NormalizedConstant;
+import net.ess3.api.IEssentials;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -23,10 +24,7 @@ import java.io.FileWriter;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Arrays;
-import java.util.List;
-import java.util.StringJoiner;
-import java.util.UUID;
+import java.util.*;
 import java.util.logging.Level;
 
 public class MainCommand implements CommandExecutor, TabCompleter {
@@ -34,6 +32,7 @@ public class MainCommand implements CommandExecutor, TabCompleter {
   private final OfflinePlayerRegistry offlinePlayerRegistry;
   private final UserDataStore userDataStore;
   private final CalendarInfoProvider calendarInfoProvider;
+  private final IEssentials essentials;
   private final ConfigKeeper<MainSection> config;
   private final Plugin plugin;
 
@@ -41,12 +40,14 @@ public class MainCommand implements CommandExecutor, TabCompleter {
     OfflinePlayerRegistry offlinePlayerRegistry,
     UserDataStore userDataStore,
     CalendarInfoProvider calendarInfoProvider,
+    IEssentials essentials,
     ConfigKeeper<MainSection> config,
     Plugin plugin
   ) {
     this.offlinePlayerRegistry = offlinePlayerRegistry;
     this.userDataStore = userDataStore;
     this.calendarInfoProvider = calendarInfoProvider;
+    this.essentials = essentials;
     this.config = config;
     this.plugin = plugin;
   }
@@ -293,16 +294,29 @@ public class MainCommand implements CommandExecutor, TabCompleter {
           var outputFile = new File(plugin.getDataFolder(), "export-" + dateStamp + "-" + typeString + ".csv");
 
           try (var writer = new FileWriter(outputFile)) {
-            writer.write(makeCSVRow("name","uuid","time"));
+            writer.write(makeCSVRow("name","uuid","time", "last_login"));
+
+            var lastLoginFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
 
             for (var dataEntry : userData) {
+              var lastLogin = 0L;
+
+              var essentialsUser = essentials.getUser(dataEntry.playerId);
+
+              if (essentialsUser != null)
+                lastLogin = essentialsUser.getLastLogin();
+
+              var lastLoginDate = new Date(lastLogin).toInstant().atZone(config.rootSection._timeZone);
+
               var timeString = config.rootSection.commands.main.exportTimeFormat.asPlainString(
                 new InterpretationEnvironment()
                   .withVariable("time", topType.constant.accessStatistic(dataEntry, timeType.constant))
               );
 
+              var lastLoginString = lastLoginFormatter.format(lastLoginDate);
+
               writer.write('\n');
-              writer.write(makeCSVRow(dataEntry.getLastKnownName(), dataEntry.playerId, timeString));
+              writer.write(makeCSVRow(dataEntry.getLastKnownName(), dataEntry.playerId, timeString, lastLoginString));
             }
           } catch (Throwable e) {
             plugin.getLogger().log(Level.SEVERE, "An error occurred while trying to write to " + outputFile, e);

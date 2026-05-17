@@ -87,7 +87,7 @@ public class PlaytimeRewardsPlugin extends JavaPlugin {
       setExecutorAndCompleter(rewardsCommand, new RewardsCommand(userDataStore, rewardsDisplayHandler, offlinePlayerRegistry, config));
 
       var mainCommand = Objects.requireNonNull(getCommand(MainCommandSection.INITIAL_NAME));
-      setExecutorAndCompleter(mainCommand, new MainCommand(offlinePlayerRegistry, userDataStore, calendarInfoProvider, config, this));
+      setExecutorAndCompleter(mainCommand, new MainCommand(offlinePlayerRegistry, userDataStore, calendarInfoProvider, essentials, config, this));
 
       var commandUpdater = new CommandUpdater(this);
 
