@@ -19,21 +19,22 @@ import at.blvckbytes.playtime_rewards.config.MainSection;
 import at.blvckbytes.playtime_rewards.placeholder.PlaytimePlaceholderExpansion;
 import at.blvckbytes.playtime_rewards.rewards.RewardsManager;
 import at.blvckbytes.playtime_rewards.rewards_display.RewardsDisplayHandler;
-import at.blvckbytes.playtime_rewards.store.CalendarInfoProvider;
-import at.blvckbytes.playtime_rewards.store.UserDataStore;
+import at.blvckbytes.playtime_rewards.store.*;
 import net.ess3.api.IEssentials;
 import net.luckperms.api.LuckPerms;
 import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.command.TabCompleter;
+import org.bukkit.plugin.ServicePriority;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
 import java.util.logging.Level;
 
-public class PlaytimeRewardsPlugin extends JavaPlugin {
+public class PlaytimeRewardsPlugin extends JavaPlugin implements PlaytimeRewardsAPI {
 
   private @Nullable UserDataStore userDataStore;
   private @Nullable RewardsDisplayHandler rewardsDisplayHandler;
@@ -104,6 +105,8 @@ public class PlaytimeRewardsPlugin extends JavaPlugin {
 
       config.registerReloadListener(updateCommands);
       config.registerReloadListener(commandUpdater::trySyncCommands, ReloadPriority.LOWEST);
+
+      Bukkit.getServer().getServicesManager().register(PlaytimeRewardsAPI.class, this, this, ServicePriority.Normal);
     } catch (Throwable e) {
       logger.log(Level.SEVERE, "An error occurred while trying to enable the plugin; disabling!", e);
       Bukkit.getPluginManager().disablePlugin(this);
@@ -136,5 +139,29 @@ public class PlaytimeRewardsPlugin extends JavaPlugin {
 
     if (executor instanceof TabCompleter tabCompleter)
       command.setTabCompleter(tabCompleter);
+  }
+
+  @Override
+  public long getTotalTimeTicks(OfflinePlayer player, TimeType timeType) {
+    if (userDataStore == null)
+      return 0;
+
+    return userDataStore.access(player).getTotalTimeTicks(timeType);
+  }
+
+  @Override
+  public long getCalendarBucketTimeTicks(OfflinePlayer player, CalendarBucket calendarBucket, TimeType timeType) {
+    if (userDataStore == null)
+      return 0;
+
+    return userDataStore.access(player).getCalendarBucketTimeTicks(calendarBucket, timeType);
+  }
+
+  @Override
+  public int getTopListNumber(OfflinePlayer player, TopListType topListType, TopListDirection topListDirection, TimeType timeType) {
+    if (userDataStore == null)
+      return 0;
+
+    return userDataStore.access(player).getTopListNumber(topListType, timeType, topListDirection);
   }
 }
