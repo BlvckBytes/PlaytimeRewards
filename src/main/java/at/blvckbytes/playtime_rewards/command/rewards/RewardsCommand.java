@@ -49,7 +49,7 @@ public class RewardsCommand implements CommandExecutor, TabCompleter {
       target = player;
 
     else {
-      target = offlinePlayerRegistry.getPlayerByName(args[1]);
+      target = offlinePlayerRegistry.getPlayerByName(args[0]);
 
       if (target == null) {
         config.rootSection.commonMessages.hasNotPlayedBefore.sendMessage(
