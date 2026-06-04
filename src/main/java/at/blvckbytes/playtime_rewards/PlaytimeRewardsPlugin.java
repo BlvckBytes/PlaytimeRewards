@@ -27,6 +27,7 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.command.TabCompleter;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.ServicePriority;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.Nullable;
@@ -38,6 +39,7 @@ public class PlaytimeRewardsPlugin extends JavaPlugin implements PlaytimeRewards
 
   private @Nullable UserDataStore userDataStore;
   private @Nullable RewardsDisplayHandler rewardsDisplayHandler;
+  private @Nullable RewardsManager rewardsManager;
 
   @Override
   public void onEnable() {
@@ -66,7 +68,7 @@ public class PlaytimeRewardsPlugin extends JavaPlugin implements PlaytimeRewards
       if (Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI"))
         new PlaytimePlaceholderExpansion(this, userDataStore, config).register();
 
-      var rewardsManager = new RewardsManager(userDataStore, luckPerms, essentials, config, this);
+      rewardsManager = new RewardsManager(userDataStore, luckPerms, essentials, config, this);
       getServer().getPluginManager().registerEvents(rewardsManager, this);
 
       var offlinePlayerRegistry = new OfflinePlayerRegistry(userDataStore);
@@ -163,5 +165,13 @@ public class PlaytimeRewardsPlugin extends JavaPlugin implements PlaytimeRewards
       return 0;
 
     return userDataStore.access(player).getTopListNumber(topListType, timeType, topListDirection);
+  }
+
+  @Override
+  public long getRemainingTimeUntilNextRank(Player player) {
+    if (rewardsManager == null)
+      return 0;
+
+    return rewardsManager.getRemainingTimeUntilNextRank(player);
   }
 }

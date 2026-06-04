@@ -13,14 +13,14 @@ import net.luckperms.api.model.data.DataMutateResult;
 import net.luckperms.api.node.types.InheritanceNode;
 import net.luckperms.api.query.QueryOptions;
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.Plugin;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class RewardsManager implements Listener {
 
@@ -33,6 +33,7 @@ public class RewardsManager implements Listener {
   private final Plugin plugin;
 
   private final List<PlayerAndMeta> currentlyOnline;
+  private final Map<UUID, PlayerAndMeta> metaByPlayerId;
 
   private int relativeTime;
 
@@ -50,6 +51,7 @@ public class RewardsManager implements Listener {
     this.plugin = plugin;
 
     this.currentlyOnline = new ArrayList<>();
+    this.metaByPlayerId = new HashMap<>();
 
     config.registerReloadListener(this::warnAboutMissingGroups, ReloadPriority.HIGHEST);
     warnAboutMissingGroups();
@@ -85,6 +87,32 @@ public class RewardsManager implements Listener {
       if (!afkPlayersBuffer.isEmpty())
         userDataStore.batchIncrementTimeFor(TimeType.AFK_TIME, afkPlayersBuffer, intervalTicks);
     }, 0L, 0L);
+  }
+
+  public long getRemainingTimeUntilNextRank(Player player) {
+    var meta = metaByPlayerId.get(player.getUniqueId());
+
+    if (meta == null)
+      return 0;
+
+    var playTime = meta.userData.getTotalTimeTicks(TimeType.PLAY_TIME);
+
+    var minRemainingTime = 0L;
+
+    for (var rank : config.rootSection.rankList) {
+      if (rank.group == null)
+        continue;
+
+      if (playTime >= rank._requiredPlayTimeTicks)
+        continue;
+
+      var remainingTime = rank._requiredPlayTimeTicks - playTime;
+
+      if (minRemainingTime == 0 || remainingTime < minRemainingTime)
+        minRemainingTime = remainingTime;
+    }
+
+    return minRemainingTime;
   }
 
   private void warnAboutMissingGroups() {
@@ -174,12 +202,18 @@ public class RewardsManager implements Listener {
         return;
       }
 
-      currentlyOnline.add(new PlayerAndMeta(player, essentialsUser, luckPermsUser, userData));
+      var meta = new PlayerAndMeta(player, essentialsUser, luckPermsUser, userData);
+
+      currentlyOnline.add(meta);
+      metaByPlayerId.put(player.getUniqueId(), meta);
     }, 1);
   }
 
   @EventHandler
   public void onQuit(PlayerQuitEvent event) {
-    currentlyOnline.removeIf(it -> it.player == event.getPlayer());
+    var player = event.getPlayer();
+
+    currentlyOnline.removeIf(it -> it.player == player);
+    metaByPlayerId.remove(player.getUniqueId());
   }
 }
