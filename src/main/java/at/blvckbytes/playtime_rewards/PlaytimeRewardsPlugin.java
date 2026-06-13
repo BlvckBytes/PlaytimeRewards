@@ -2,7 +2,7 @@ package at.blvckbytes.playtime_rewards;
 
 import at.blvckbytes.cm_mapper.ConfigHandler;
 import at.blvckbytes.cm_mapper.ConfigKeeper;
-import at.blvckbytes.cm_mapper.ReloadPriority;
+import at.blvckbytes.cm_mapper.ConfigKeeperReloadEvent;
 import at.blvckbytes.cm_mapper.section.command.CommandUpdater;
 import at.blvckbytes.playtime_rewards.command.*;
 import at.blvckbytes.playtime_rewards.command.main.MainCommandSection;
@@ -28,6 +28,9 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
 import org.bukkit.plugin.ServicePriority;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.Nullable;
@@ -35,11 +38,15 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Objects;
 import java.util.logging.Level;
 
-public class PlaytimeRewardsPlugin extends JavaPlugin implements PlaytimeRewardsAPI {
+public class PlaytimeRewardsPlugin extends JavaPlugin implements PlaytimeRewardsAPI, Listener {
+
+  // TODO: This should be refactored to use the new AutoWirer.
 
   private @Nullable UserDataStore userDataStore;
   private @Nullable RewardsDisplayHandler rewardsDisplayHandler;
   private @Nullable RewardsManager rewardsManager;
+  private @Nullable Runnable updateCommands;
+  private @Nullable ConfigKeeper<MainSection> config;
 
   @Override
   public void onEnable() {
@@ -47,7 +54,7 @@ public class PlaytimeRewardsPlugin extends JavaPlugin implements PlaytimeRewards
 
     try {
       var configHandler = new ConfigHandler(this, "config");
-      var config = new ConfigKeeper<>(configHandler, "config.yml", MainSection.class);
+      config = new ConfigKeeper<>(configHandler, "config.yml", MainSection.class);
 
       var luckPermsProvider = Bukkit.getServicesManager().getRegistration(LuckPerms.class);
 
@@ -94,25 +101,31 @@ public class PlaytimeRewardsPlugin extends JavaPlugin implements PlaytimeRewards
 
       var commandUpdater = new CommandUpdater(this);
 
-      Runnable updateCommands = () -> {
+      updateCommands = () -> {
         config.rootSection.commands.playtime.apply(playtimeCommand, commandUpdater);
         config.rootSection.commands.playTop.apply(playTopCommand, commandUpdater);
         config.rootSection.commands.afkTop.apply(afkTopCommand, commandUpdater);
         config.rootSection.commands.rewards.apply(rewardsCommand, commandUpdater);
         config.rootSection.commands.main.apply(mainCommand, commandUpdater);
+
+        commandUpdater.trySyncCommands();
       };
 
       updateCommands.run();
-      commandUpdater.trySyncCommands();
 
-      config.registerReloadListener(updateCommands);
-      config.registerReloadListener(commandUpdater::trySyncCommands, ReloadPriority.LOWEST);
+      Bukkit.getPluginManager().registerEvents(this, this);
 
       Bukkit.getServer().getServicesManager().register(PlaytimeRewardsAPI.class, this, this, ServicePriority.Normal);
     } catch (Throwable e) {
       logger.log(Level.SEVERE, "An error occurred while trying to enable the plugin; disabling!", e);
       Bukkit.getPluginManager().disablePlugin(this);
     }
+  }
+
+  @EventHandler(priority = EventPriority.LOWEST)
+  public void onConfigReload(ConfigKeeperReloadEvent event) {
+    if (event.configKeeper == config && updateCommands != null)
+      updateCommands.run();
   }
 
   @Override

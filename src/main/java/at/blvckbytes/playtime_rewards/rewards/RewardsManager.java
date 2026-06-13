@@ -1,7 +1,7 @@
 package at.blvckbytes.playtime_rewards.rewards;
 
 import at.blvckbytes.cm_mapper.ConfigKeeper;
-import at.blvckbytes.cm_mapper.ReloadPriority;
+import at.blvckbytes.cm_mapper.ConfigKeeperReloadEvent;
 import at.blvckbytes.component_markup.expression.interpreter.InterpretationEnvironment;
 import at.blvckbytes.playtime_rewards.config.MainSection;
 import at.blvckbytes.playtime_rewards.config.RankSection;
@@ -53,7 +53,6 @@ public class RewardsManager implements Listener {
     this.currentlyOnline = new ArrayList<>();
     this.metaByPlayerId = new HashMap<>();
 
-    config.registerReloadListener(this::warnAboutMissingGroups, ReloadPriority.HIGHEST);
     warnAboutMissingGroups();
 
     var afkPlayersBuffer = new ArrayList<PlayerAndMeta>();
@@ -87,6 +86,12 @@ public class RewardsManager implements Listener {
       if (!afkPlayersBuffer.isEmpty())
         userDataStore.batchIncrementTimeFor(TimeType.AFK_TIME, afkPlayersBuffer, intervalTicks);
     }, 0L, 0L);
+  }
+
+  @EventHandler
+  public void onConfigReload(ConfigKeeperReloadEvent event) {
+    if (event.configKeeper == config)
+      warnAboutMissingGroups();
   }
 
   public long getRemainingTimeUntilNextRank(Player player) {
